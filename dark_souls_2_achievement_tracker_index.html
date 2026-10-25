@@ -1,0 +1,354 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>ダークソウル2 トロコン帳</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style id="css">
+/* Layout: one column ledger — header with progress, tab strip, grouped rows with grade seal + checkbox */
+:root{
+  --bg:#e6e8ea; --panel:#f3f4f5; --line:#c9cdd2; --fg:#1d2228; --muted:#5d6670;
+  --ember:#9a5b14; --ember-soft:#f0dcc0; --done:#3e6b4f;
+  --plat:#6f7f93; --gold:#a8801c; --silver:#7d858e; --bronze:#94603a;
+  --display:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif;
+  --body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#14171c; --panel:#1c2027; --line:#2e343d; --fg:#e4e1da; --muted:#959ba3;
+  --ember:#e0a04a; --ember-soft:#3a2a17; --done:#7fb08f;
+  --plat:#a9b8cb; --gold:#d8ae45; --silver:#b4bbc3; --bronze:#c58a5c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#14171c; --panel:#1c2027; --line:#2e343d; --fg:#e4e1da; --muted:#959ba3;
+  --ember:#e0a04a; --ember-soft:#3a2a17; --done:#7fb08f;
+  --plat:#a9b8cb; --gold:#d8ae45; --silver:#b4bbc3; --bronze:#c58a5c; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.6}
+.wrap{max-width:820px;margin:0 auto;padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:22px}
+header{display:grid;gap:14px}
+.eyebrow{font-size:12px;letter-spacing:.14em;color:var(--muted)}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(28px,6vw,40px);line-height:1.15;margin:0;text-wrap:balance}
+h1 span{color:var(--ember)}
+.meter{display:grid;gap:6px}
+.meter-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.meter-big{font-family:var(--mono);font-size:22px;font-variant-numeric:tabular-nums}
+.meter-big small{font-size:14px;color:var(--muted)}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ember);transition:width .3s}
+.save{font-size:12px;color:var(--muted)}
+.tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;scrollbar-width:none}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.tab{flex:0 0 auto;border:0;background:none;color:var(--muted);font:500 14px var(--body);padding:10px 12px;border-bottom:2px solid transparent;cursor:pointer;display:flex;gap:6px;align-items:baseline}
+.tab b{font:500 12px var(--mono);font-variant-numeric:tabular-nums}
+.tab[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--ember)}
+.tab:focus-visible,.chk:focus-visible,.toggle input:focus-visible{outline:2px solid var(--ember);outline-offset:2px}
+.tools{display:flex;gap:16px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.toggle{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--muted);cursor:pointer}
+.note{font-size:13px;color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px 12px}
+.note strong{color:var(--fg)}
+.group{display:grid;gap:0}
+.group h2{font-family:var(--display);font-weight:600;font-size:17px;margin:0 0 6px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.group h2 span{font:500 12px var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.row{display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:start;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}
+.row:last-child{border-bottom:1px solid var(--line)}
+.row .txt{min-width:0}
+.name{font-weight:700}
+.desc{font-size:13px;color:var(--muted)}
+.tip{font-size:12.5px;color:var(--fg);opacity:.8;margin-top:2px}
+.row.on .name{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--done)}
+.row.dlc .name::after{content:"DLC";font:500 10.5px var(--body);letter-spacing:.06em;margin-left:8px;padding:1px 6px;border:1px solid var(--line);border-radius:3px;color:var(--muted);vertical-align:2px}
+.chk{appearance:none;width:22px;height:22px;margin:2px 0 0;border:1.5px solid var(--muted);border-radius:4px;display:grid;place-items:center;cursor:pointer;background:var(--panel)}
+.chk:checked{background:var(--done);border-color:var(--done)}
+.chk:checked::after{content:"";width:6px;height:11px;border:solid var(--panel);border-width:0 2.5px 2.5px 0;transform:translateY(-1px) rotate(45deg)}
+.seal{font:500 11px var(--body);letter-spacing:.05em;padding:2px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap;margin-top:2px}
+.g-P{color:var(--plat)}.g-G{color:var(--gold)}.g-S{color:var(--silver)}.g-B{color:var(--bronze)}
+.chip{color:var(--ember);max-width:9.5em;white-space:normal;text-align:center;line-height:1.35}
+.lead{margin:0 0 8px;font-size:13.5px;color:var(--muted)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px 16px;display:grid;gap:10px}
+.card h3{font-family:var(--display);font-weight:600;font-size:16px;margin:0}
+.card p{margin:0;font-size:13.5px}
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:6px 14px}
+.stats div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dotted var(--line);padding-bottom:2px;font-size:13.5px}
+.stats b{font-family:var(--mono);font-weight:500;font-variant-numeric:tabular-nums}
+.tbl{overflow-x:auto}
+.tbl table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:420px}
+.tbl th,.tbl td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl th{font-weight:500;color:var(--muted);font-size:12px;letter-spacing:.04em}
+.tbl td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+ul.tips{margin:0;padding-left:1.2em;display:grid;gap:4px;font-size:13.5px}
+.empty{color:var(--muted);font-size:14px;padding:16px 0}
+footer{font-size:12px;color:var(--muted);display:grid;gap:6px}
+footer a{color:var(--muted)}
+.reset{justify-self:start;background:none;border:1px solid var(--line);color:var(--muted);border-radius:4px;padding:4px 10px;font:12px var(--body);cursor:pointer}
+.confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px}
+.confirm button{border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:4px;padding:4px 10px;font:12px var(--body);cursor:pointer}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+<main id="app" class="wrap"></main>
+<script type="application/json" id="state">{"c":{"so0":1,"so1":1}}</script>
+<script id="main">
+(()=>{
+const T=[
+ ["ストーリー",[
+  ["t01","P","ダークソウル","全てのトロフィーを取得した","他の37個を取ると自動で取得"],
+  ["t02","B","失われた記憶","肉体を取り戻し、不死としての一歩を踏み出した","ゲーム開始直後に取得"],
+  ["t03","B","ダークソウルの始まり","初めて死亡した",""],
+  ["t04","B","最後の巨人","最後の巨人を倒した","朽ちた巨人の森のボス"],
+  ["t05","S","鏡の騎士","鏡の騎士を倒した","王城ドラングレイグのボス"],
+  ["t06","S","王の指輪","王の指輪を入手した","不死廟で入手"],
+  ["t07","S","古の竜","灰の霧の核を入手した","竜の祭祀場の先"],
+  ["t08","G","継ぐ者","エンディングに到達した",""]]],
+ ["原始の篝火",[
+  ["t09","S","罪人の篝火","罪人の塔の篝火に火を灯した",""],
+  ["t10","S","熔鉄の篝火","熔鉄城の篝火に火を灯した",""],
+  ["t11","S","渓谷の篝火","黒渓谷の篝火に火を灯した",""],
+  ["t12","S","輝石の篝火","輝石街ジェルドラの篝火に火を灯した",""]]],
+ ["やり込み",[
+  ["t13","S","ヴァンクラッド","ヴァンクラッドを倒した","不死廟の奥。任意ボス"],
+  ["t14","S","至高の武器を鍛えし者","いずれかの武器を最高レベルに強化した",""],
+  ["t15","S","ジェスチャーマスター","ジェスチャーを全て集めた",""],
+  ["t16","S","全ての魔術を会得せし者","全ての魔術を取得した","「魔術」タブで管理"],
+  ["t17","S","全ての奇跡を会得せし者","全ての奇跡を取得した","「奇跡」タブで管理"],
+  ["t18","S","全ての呪術を会得せし者","全ての呪術を取得した","「呪術」タブで管理"],
+  ["t19","S","全ての闇術を会得せし者","全ての闇術を取得した","「闇術」タブで管理"],
+  ["t20","G","身を捧げし者","いずれかの誓約で絆が最大になった","どれか1つの誓約をランク3に。太陽の後継か闇の巡礼者がスペル集めと兼ねられる"],
+  ["t21","S","奇妙な地図の完成","マデューラの地図に全ての火が灯った","ケイルを生かしておき、地図の火が全て灯ったら話しかける"]]],
+ ["誓約",[
+  ["t22","B","輝かしき誓約","輝かしき誓約を発見した","太陽の後継"],
+  ["t23","B","守護の誓約","守護の誓約を発見した","青の守護者"],
+  ["t24","B","血を求めし誓約","血を求めし誓約を発見した","血の同胞"],
+  ["t25","B","弱き者の誓約","弱き者の誓約を発見した",""],
+  ["t26","B","ネズミの誓約","ネズミの誓約を発見した","聖人墓所／ファロスの扉道"],
+  ["t27","B","鐘の誓約","鐘の誓約を発見した","鐘守（月の鐘楼／陽の鐘楼）"],
+  ["t28","B","古き誓約","古き誓約を発見した",""],
+  ["t29","B","強き者の誓約","強き者の誓約を発見した","覇者"],
+  ["t30","B","深き闇の誓約","深き闇の誓約を発見した","闇の巡礼者"]]],
+ ["マデューラ・NPC",[
+  ["t31","S","衣替え","メルヴィアのロザベナに着替えを渡した","懐かしい香木で石化を解き、防具を1つ渡す"],
+  ["t32","S","うち捨てられた人々","マデューラに多くの人が集まった","メレンティラ・ケイル・リーシュ・カリオン・ロザベナ・クロアーナ・ギリガンをマデューラへ。達成前に誰も殺さない"],
+  ["t33","S","月光の大剣","ウーゴのバンホルトから物を譲り受けた","会話を進め、白霊として3回ボス戦に呼んで生き残らせる（取り逃し注意）"],
+  ["t34","S","砦の守護者","王国隊長ドラモンドから物を譲り受けた","巨人の王を倒してから話しかける"],
+  ["t35","S","ルカティエル","ミラのルカティエルから物を譲り受けた","会話を進め、白霊として3回ボス戦に呼んで生き残らせる（取り逃し注意）"],
+  ["t36","S","熟練の職工","熟練のマックダフから物を譲り受けた",""],
+  ["t37","S","守銭奴","渡し屋ギリガンから物を譲り受けた","会話を尽くす前にマデューラへ移動させる"],
+  ["t38","S","思索する首","ヴァンガルの首から物を譲り受けた","ヴァンガルの首と何度も話す"]]]
+];
+const S={
+ so:{name:"魔術",trophy:"t16",items:[
+  ["ソウルの矢","素性「魔術師」初期／商人"],["強いソウルの矢","朽ちた巨人の森／商人"],["ソウルの太矢","商人"],["強いソウルの太矢","土の塔／商人"],
+  ["追尾するソウルの矢","商人"],["追尾するソウルの太矢","ストレイドと物々交換（廃墟の番兵のソウル）"],["追尾するソウルの塊","虚ろの影の森／商人"],["追尾するソウルの結晶塊","アマナの祭壇"],
+  ["ソウルの槍","狩猟の森／アガドゥラン"],["ソウルの結晶槍","ストレイドと物々交換（2周目以降の公爵の娘フレイディアのソウル）"],["衝撃","商人"],["乱れるソウルの槍","商人"],["降り注ぐソウル","ストレイドと物々交換"],
+  ["ソウルの大剣","王城ドラングレイグ"],["渦巻くソウルの塊","マデューラの大穴／輝石街ジェルドラ／アガドゥラン"],["ソウルの閃光","王の回廊"],["ソウルの奔流","アン・ディールの館"],
+  ["魔法の武器","商人"],["強い魔法の武器","黒渓谷／誓約「覇者」／商人"],["結晶魔法の武器","祭祀場"],["強い魔法の盾","王城ドラングレイグ／商人"],
+  ["望郷","商人"],["音無し","忘却の牢／誓約「青の守護者」"],["落下制御","商人"],["見えない武器","誓約「鐘守」ランク2（陽の鐘楼の狂戦士を倒して上げられる）"],["修復","冬の祠"],
+  ["照らす光","商人"],["擬態","溜りの谷"],["魔力開放","ナヴァーランの依頼報酬（解放しない）"],["収束するソウル","DLC「深い底の王の冠」",1],["ソウルの一閃","DLC「白王の冠」",1]
+ ],dlc:[]},
+ mi:{name:"奇跡",trophy:"t17",items:[
+  ["回復","素性「聖職者」初期／メレンティラ／リーシュ"],["中回復","リーシュ"],["限られた大回復","リーシュ"],["大回復","クロムウェル／聖人墓所"],
+  ["太陽の光の癒し","潰れた瞳のオーブでリーシュを倒す（他の奇跡を全て買い、「うち捨てられた人々」取得後に）"],["生命湧き","リーシュ／クロムウェル"],["溢れ出る生命","リーシュ／ストレイド／忘却の牢"],
+  ["太陽の光の恵み","ベラガー（3周目以降）／誓約「青の守護者」ランク3"],["治癒の祈り","リーシュ／クロムウェル"],["フォース","リーシュ／クロムウェル"],
+  ["神の怒り","ベラガー（3周目以降）／誓約「青の守護者」ランク2"],["放つフォース","ガラインドーク／クロムウェル／隠れ港"],["天の雷鳴","ガラインドーク／クロムウェル"],
+  ["雷の槍","リーシュ／土の塔"],["雷の大槍","ストレイド（王の指輪が必要）／マデューラの大穴／不死廟"],["太陽の光の槍","誓約「太陽の後継」ランク3"],["鎮魂","クロアーナ／アガドゥラン"],
+  ["輝かしい雷球","ストレイドと物々交換（2周目以降の鉄の古王のソウル）"],["魔法防護","フェルキン／ヴァンガルの首"],["大魔法防護","ベラガー／アン・ディールの館／王城ドラングレイグ"],
+  ["家路","リーシュ"],["導きの言葉","リーシュ"],["固い誓い","ストレイドと物々交換（ヴェルスタッドのソウル）"],["敵意の感知","ストレイド"],
+  ["大いなる抵抗","クロムウェル"],["太陽の光の剣","ストレイド／アマナの祭壇"]
+  ],dlc:[["惜別","DLC「深い底の王の冠」"],["裂かれる雷の槍","DLC「白王の冠」"]]},
+ py:{name:"呪術",trophy:"t18",items:[
+  ["火球","ロザベナ"],["火の玉","ロザベナ"],["大火球","輝石街ジェルドラ（輝石街の鍵）"],["混沌の大火球","ベラガー（3周目以降）／誓約「血の同胞」ランク3"],
+  ["炎の嵐","グレネイン"],["炎の大嵐","アマナの祭壇"],["混沌の嵐","熔鉄城（溶岩床の上）"],["発火","ロザベナ"],["大発火","グレネイン"],["薙ぎ払う炎","グレネイン"],
+  ["毒の霧","ロザベナ"],["猛毒の霧","ストレイドと物々交換"],["酸の噴射","ストレイドと物々交換"],["漂う火球","ストレイド"],["炎の鎚","ストレイド"],
+  ["封じられた太陽","ナヴァーランの依頼報酬（解放しない）"],["炎の武器","ストレイドと物々交換（2周目以降の忘れられた罪人のソウル）"],["激しい発汗","ロザベナ"],["鉄の体","ロザベナ"],
+  ["ぬくもりの火","アガドゥラン"],["身を焦がす火","陽の鐘楼"]
+ ],dlc:[["火蛇","DLC「古い鉄の王の冠」"],["舞踏の火","DLC「古い鉄の王の冠」"],["咆哮","DLC「古い鉄の王の冠」"]]},
+ he:{name:"闇術",trophy:"t19",items:[
+  ["闇の球","フェルキン／ストレイド／グランダル"],["闇の飛沫","ストレイド／マグヘラルド／グランダル"],["闇の霧","ストレイド／クズ底"],["追う者たち","ストレイド／アン・ディールの館"],
+  ["死者の活性","クロアーナ／黒渓谷"],["闇の武器","フェルキン"],["失望の囁き","聖人墓所（ファロスの石）"],["反動","ストレイドと物々交換"],["歪曲した防壁","ファロスの扉道"],
+  ["激しい鈍麻","ストレイドと物々交換（2周目以降の腐れのソウル）"],["生命の残滓","クロムウェル／黒渓谷"],["闇の嵐","マグヘラルド／グランダル"],["ソウルの共鳴","フェルキン／誓約「闇の巡礼者」ランク1"],
+  ["ソウルの大きな共鳴","フェルキン／誓約「闇の巡礼者」ランク2"],["絶頂","誓約「闇の巡礼者」ランク3"],["共鳴する体","フェルキン"],["共鳴する武器","フェルキン"],
+  ["小さな吸精の光","ストレイドと物々交換"],["深い沈黙","グランダル"]
+ ],dlc:[["闇の大剣","DLC「深い底の王の冠」"],["約束された平和の歩み","DLC「深い底の王の冠」"],["追憶","DLC「古い鉄の王の冠」"],["闇の踊り","DLC「白王の冠」"]]}
+};
+const CH=[
+ ["A","1周目","本編とDLCをすべて回り、交換・3周目販売以外のスペルとトロフィーをここで集める。",[
+  ["ジェスチャーを集めながら進める","NPCとの会話で覚えるものが多い。会話は尽くしておく","ジェスチャーマスター"],
+  ["ボスソウルは砕かずに保管する","ストレイドとの物々交換に使う","スペル全般"],
+  ["忘却の牢でストレイドを解放する","懐かしい香木を使う。取引には理力3・信仰3","スペル全般"],
+  ["ロザベナの石化を解き、防具を1つ渡す","懐かしい香木を使う","衣替え"],
+  ["マデューラへ7人を呼ぶ","メレンティラ・ケイル・リーシュ・カリオン・ロザベナ・クロアーナ・ギリガン。達成まで誰も殺さない","うち捨てられた人々"],
+  ["ギリガンは会話を尽くす前にマデューラへ","移動後に物を譲り受ける","守銭奴"],
+  ["ルカティエルとバンホルトを3回ずつ白霊で呼ぶ","会話を進め、ボス戦で生き残らせる。ルカティエルはアン・ディールの館での最後の会話より前に条件を満たす","ルカティエル／月光の大剣"],
+  ["巨人の王を倒してからドラモンドと話す","","砦の守護者"],
+  ["9つの誓約をすべて結ぶ","発見するだけでよい。目的の誓約には後で戻す","誓約×9"],
+  ["太陽の後継：太陽のメダル30枚","ランク3で太陽の光の槍。オフラインは鷹匠などから稼ぐ","身を捧げし者／奇跡"],
+  ["鐘守：陽の鐘楼の狂戦士を30回倒す","ランク2で見えない武器","魔術"],
+  ["闇の巡礼者：古き闇の穴3つと闇潜みを攻略","ランク3で絶頂","闇術"],
+  ["ナヴァーランの依頼品を集める","アン・ディールの館のレバーは引かない","魔術／呪術"],
+  ["リーシュの奇跡を全部買ってから倒す","「うち捨てられた人々」取得後に潰れた瞳のオーブで侵入","奇跡"],
+  ["DLC3エリアでスペル11種を回収","深い底の王の冠・古い鉄の王の冠・白王の冠","スペル全般"],
+  ["武器を1本、最大まで強化する","レイピアやメイスなど使う武器で兼ねる","至高の武器を鍛えし者"],
+  ["ヴァンクラッドを倒す","巨人のソウルを4つ以上持って挑む","ヴァンクラッド"],
+  ["ケイルを生かしたまま地図の火を全部灯す","灯ったらケイルに話しかける","奇妙な地図の完成"],
+  ["エンディング前に購入漏れを確認","商人のスペルを全部買ったかタブで照合","継ぐ者"]]],
+ ["B","2周目","四大ソウルをスペルに交換する周回。",[
+  ["四大ソウルをストレイドと交換する","鉄の古王→輝かしい雷球、忘れられた罪人→炎の武器、腐れ→激しい鈍麻、公爵の娘フレイディア→ソウルの結晶槍","奇跡／呪術／闇術／魔術"],
+  ["交換で使った分、冬の祠は総取得ソウルで開ける","腐れの周回などで総取得ソウルを稼ぐ（目安は周回開始時から＋約200万）",""],
+  ["エンディングまで進める","",""]]],
+ ["C","3周目","ベラガーの3種を買えば完了。クリアは不要。",[
+  ["冬の祠を開ける","総取得ソウルをさらに稼ぐ（目安は＋約300万）",""],
+  ["王城ドラングレイグでベラガーから3種を買う","神の怒り・太陽の光の恵み・混沌の大火球","奇跡／呪術"],
+  ["4つの会得トロフィーとプラチナを確認","","ダークソウル"]]]
+];
+const BUILD=`
+<section class="card"><h3>推奨：闇術ビルド</h3>
+<p>闇術は理力と信仰の<strong>低いほう</strong>で威力が決まるので、2つを同じ値でそろえて上げます。トロコンでは理力・信仰を上げる場面が多く、その振り分けがそのまま火力になります。</p>
+<div class="stats"><div>生命力<b>40</b></div><div>持久力<b>20</b></div><div>体力<b>10</b></div><div>記憶力<b>30</b></div><div>筋力<b>14</b></div><div>技量<b>12</b></div><div>適応力<b>20</b></div><div>理力<b>40</b></div><div>信仰<b>40</b></div></div>
+<p>理力・信仰は30を超えると伸びがゆるやかになります。まず30/30を目指し、その後は生命力と交互に上げてください。メダル稼ぎで深い沈黙を使う時期だけ、信仰を42まで上げます。</p>
+<ul class="tips">
+<li><strong>序盤</strong>：狩猟の森のフェルキンから闇の球を買う。取引には理力8・信仰8、闇の球を使うには理力12・信仰10が必要。</li>
+<li><strong>触媒</strong>：理力20・信仰20でフェルキンがくれる杖が、闇術向きの杖の最有力。闇派生で強化する。ナヴァーランの依頼品も兼ねる。</li>
+<li><strong>主力の闇術</strong>：闇の球（基本の遠距離攻撃）、闇の飛沫（集団・大型向け）、追う者たち（攻撃と防御を兼ねる）。近接武器は闇派生にして闇の武器をかける。</li>
+<li><strong>ソウルを使う闇術</strong>：共鳴する武器・小さな吸精の光などは強力ですが、使うたびにソウルを消費します。理力より信仰が多く必要な闇術は、杖ではなく聖鈴で使います。</li>
+<li><strong>トロコンとの相性</strong>：闇術の全種購入、闇の巡礼者のランク3（絶頂）、フェルキンの杖が、どれも闇術ビルドなら自然にそろいます。</li>
+<li><strong>弱点</strong>：回復の奇跡がないので、エストと草で回復します。終盤は闇に強い敵も増えるので、物理の近接武器を1本持っておきます。</li>
+</ul></section>
+<section class="card"><h3>別案：筋力信仰ビルド</h3>
+<p>雷派生の武器で殴りつつ、太陽の光の剣や固い誓いで補助する型です。理力は1のまま、必要な場面だけ魂の器で振り直します。</p>
+<div class="stats"><div>生命力<b>50</b></div><div>持久力<b>20+</b></div><div>体力<b>11</b></div><div>記憶力<b>30</b></div><div>筋力<b>40</b></div><div>技量<b>20</b></div><div>適応力<b>30</b></div><div>理力<b>1</b></div><div>信仰<b>40</b></div></div>
+<p>目安はレベル189前後。敏捷は記憶力と適応力の合計で上がり、105前後あればローリングが安定します。</p></section>
+<section class="card"><h3>もっと手軽に：物理ビルド</h3>
+<p>+10まで鍛えたレイピアかメイスで最後まで行けます。至高の武器のトロフィーも兼ねられます。生命力と持久力を優先し、敏捷が100前後になるまで適応力を上げます。釣り用に弓を1本持っておくと楽です。</p></section>
+<section class="card"><h3>トロコンに必要なステータス</h3>
+<div class="tbl"><table><thead><tr><th>場面</th><th>必要な値</th><th>メモ</th></tr></thead><tbody>
+<tr><td>ストレイドと取引</td><td class="n">理力3・信仰3</td><td>交換スペルの窓口</td></tr>
+<tr><td>カリオンと取引</td><td class="n">理力8</td><td>魔術の商人</td></tr>
+<tr><td>フェルキンと取引</td><td class="n">理力8・信仰8</td><td>闇術・魔法防護</td></tr>
+<tr><td>フェルキンから依頼品の杖</td><td class="n">理力20・信仰20</td><td>ナヴァーランの依頼に必要</td></tr>
+<tr><td>深い沈黙で太陽のメダル稼ぎ</td><td class="n">記憶力16・理力20・信仰42</td><td>オフラインで効率化する場合</td></tr>
+</tbody></table></div>
+<p>トロフィーは「取得」が条件なので、スペルを使えるだけの能力値は要りません。足りない値は魂の器で一時的に振り直すのが早いです。</p></section>
+<section class="card"><h3>周回の小技</h3>
+<ul class="tips">
+<li>覇者の誓約を結ぶと雑魚が消えなくなるので、ソウル稼ぎやメダル稼ぎの間だけ入る。</li>
+<li>アガペの指輪を着けていると誓約の絆が上がらない。ランク上げ中は外す。</li>
+<li>篝火の探究者はボスの再戦に使えるが、そのエリアは強くなる。使いどころを決めてから。</li>
+<li>貪欲な銀の蛇の指輪とジェルドラ装備で、腐れなどのボス周回のソウル効率が上がる。</li>
+<li>四大ソウルはオルニフェクスの武器交換と取り合いになる。トロコン中はスペルを優先。</li>
+</ul></section>`;
+const GR={P:"プラチナ",G:"ゴールド",S:"シルバー",B:"ブロンズ"};
+const TABS=[["ch","チャート"],["tr","トロフィー"],["so","魔術"],["mi","奇跡"],["py","呪術"],["he","闇術"],["bd","ビルド"]];
+const chKey=(p,i)=>"c"+p+i;
+function chCnt(){let n=0,t=0;CH.forEach(([p,,,l])=>l.forEach((_,i)=>{t++;if(state.c[chKey(p,i)])n++}));return [n,t]}
+let state={c:{}};
+try{state=JSON.parse(document.getElementById("state").textContent)||{c:{}};}catch(e){}
+if(!state.c)state.c={};
+// local fallback / merge
+const LK="ds2-trophy-v1";
+function lsGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function lsSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+let ui={tab:"tr",hide:false,dlc:false};
+try{Object.assign(ui,JSON.parse(lsGet(LK+"-ui")||"{}"))}catch(e){}
+let artifact=null, mode="local", saveMsg="";
+if(!Object.keys(state.c).length){try{const l=JSON.parse(lsGet(LK)||"{}");if(l.c)state.c=l.c}catch(e){}}
+
+const app=document.getElementById("app");
+const allT=T.flatMap(g=>g[1]);
+const spellKey=(k,i,d)=>k+(d?"d":"")+i;
+function cnt(k){const s=S[k];let n=0;s.items.forEach((_,i)=>{if(state.c[spellKey(k,i)])n++});s.dlc.forEach((_,i)=>{if(state.c[spellKey(k,i,1)])n++});return [n,s.items.length+s.dlc.length]}
+function tCnt(){return [allT.filter(t=>state.c[t[0]]).length,allT.length]}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+
+function row(id,name,desc,tip,seal,extra){
+  const on=!!state.c[id];
+  if(ui.hide&&on)return "";
+  return `<label class="row${on?" on":""}${extra||""}" for="c-${id}"><input type="checkbox" class="chk" id="c-${id}" data-id="${id}"${on?" checked":""}><div class="txt"><div class="name">${esc(name)}</div>${desc?`<div class="desc">${esc(desc)}</div>`:""}${tip?`<div class="tip">${esc(tip)}</div>`:""}</div>${seal||"<span></span>"}</label>`;
+}
+function render(){
+  const [tn,tt]=tCnt();
+  const pct=Math.round(tn/tt*100);
+  let h=`<header><div class="eyebrow">DARK SOULS II ／ SCHOLAR OF THE FIRST SIN</div><h1>トロコン<span>帳</span></h1>
+  <div class="meter"><div class="meter-row"><div class="meter-big">${tn}<small> / ${tt} トロフィー（${pct}%）</small></div><div class="save" id="save">${esc(saveMsg||(mode==="shared"?"チェックはこのページに保存されます":"チェックはこのブラウザに保存されます"))}</div></div><div class="bar"><i style="width:${pct}%"></i></div></div></header>`;
+  h+=`<nav class="tabs" role="tablist">`+TABS.map(([k,l])=>{const c=k==="tr"?tCnt():k==="ch"?chCnt():k==="bd"?null:cnt(k);return `<button class="tab" role="tab" data-tab="${k}" aria-selected="${ui.tab===k}">${l}${c?`<b>${c[0]}/${c[1]}</b>`:""}</button>`}).join("")+`</nav>`;
+  if(ui.tab!=="bd")h+=`<div class="tools"><label class="toggle"><input type="checkbox" id="hide"${ui.hide?" checked":""}>取得済みを隠す</label></div>`;
+  if(ui.tab==="ch"){
+    h+=`<div class="note">2周目と3周目の途中までで完了する流れです。<strong>1周目は全スペルを1キャラで集める前提</strong>なので、同じキャラで周回してください。周回の前にはセーブのバックアップを取っておくと安心です。</div>`;
+    CH.forEach(([p,title,lead,list])=>{
+      const n=list.filter((_,i)=>state.c[chKey(p,i)]).length;
+      const rows=list.map((it,i)=>row(chKey(p,i),it[0],"",it[1],it[2]?`<span class="seal chip">${esc(it[2])}</span>`:"")).join("");
+      h+=`<section class="group"><h2>${title}<span>${n}/${list.length}</span></h2><p class="lead">${esc(lead)}</p>${rows||`<div class="empty">この周回は全て完了</div>`}</section>`;
+    });
+  }else if(ui.tab==="bd"){
+    h+=BUILD;
+  }else if(ui.tab==="tr"){
+    T.forEach(([g,list])=>{
+      const n=list.filter(t=>state.c[t[0]]).length;
+      const rows=list.map(t=>row(t[0],t[2],t[3],t[4],`<span class="seal g-${t[1]}">${GR[t[1]]}</span>`)).join("");
+      h+=`<section class="group"><h2>${g}<span>${n}/${list.length}</span></h2>${rows||`<div class="empty">このグループは全て取得済み</div>`}</section>`;
+    });
+  }else{
+    const s=S[ui.tab],[n,t]=cnt(ui.tab),tr=allT.find(x=>x[0]===s.trophy);
+    h+=`<div class="note"><strong>${esc(tr[2])}</strong>：${s.name} ${t}種が対象（DLCの${s.name}を含む）。${n===t?"全て揃いました。":`残り${t-n}種。`}スカラー版ではDLCが同梱されているため、DLCエリアのスペルも必要です。</div>`;
+    const rows=s.items.map((it,i)=>row(spellKey(ui.tab,i),it[0],"",it[1],"",it[2]?" dlc":"")).join("")+s.dlc.map((it,i)=>row(spellKey(ui.tab,i,1),it[0],"",it[1],""," dlc")).join("");
+    h+=`<section class="group"><h2>${s.name}一覧<span>${n}/${t}</span></h2>${rows||`<div class="empty">全て取得済み</div>`}</section>`;
+  }
+  h+=`<footer><div>入手方法は主な入手先の要約です（スカラー版基準）。四大ソウルは鍛冶屋オルニフェクスの武器交換と取り合いになるので、スペル交換を優先。ナヴァーランの依頼報酬（魔力開放・封じられた太陽）はレバーを引いて解放すると取り逃します。</div><div>出典：<a href="https://damnmodz.com/wiki/playstation-trophies/dark-souls-2/" target="_blank" rel="noopener">DS2 SotFS Trophy Guide</a>／<a href="https://www.fuzionbyte.com/dark-souls-ii-master-of-miracles-trophy-guide/" target="_blank" rel="noopener">Master of Miracles guide</a>／<a href="https://gameline.jp/darksouls2/sonota/trophy/" target="_blank" rel="noopener">ゲームライン トロフィー一覧</a>／<a href="https://seesaawiki.jp/project_dark2/d/%A5%C8%A5%ED%A5%D5%A5%A3%A1%BC" target="_blank" rel="noopener">ダークソウル2 攻略Wiki</a></div><div id="resetbox"><button class="reset" id="reset">チェックを全てリセット</button></div></footer>`;
+  app.innerHTML=h;
+}
+function saveUi(){lsSet(LK+"-ui",JSON.stringify(ui))}
+let timer=null;
+function persist(){
+  lsSet(LK,JSON.stringify({c:state.c}));
+  if(mode!=="shared")return;
+  clearTimeout(timer);
+  setSave("保存待ち…");
+  timer=setTimeout(publish,1500);
+}
+function setSave(m){saveMsg=m;const el=document.getElementById("save");if(el)el.textContent=m}
+function buildDoc(){
+  const head=document.head.querySelector("style");
+  const reset=head?head.textContent:"";
+  const json=JSON.stringify({c:state.c}).replace(/</g,"\\u003c");
+  const fonts=document.querySelector('link[rel="stylesheet"]');
+  return `<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>${reset}</style></head><body>`+
+   `<title>ダークソウル2 トロコン帳</title>\n<meta name="claude:viewport-fit-sides" content="cover">\n`+
+   (fonts?`<link rel="stylesheet" href="${fonts.getAttribute("href").replace(/&/g,"&amp;")}">\n`:"")+
+   `<style id="css">${document.getElementById("css").textContent}</style>\n<main id="app" class="wrap"></main>\n`+
+   `<script type="application/json" id="state">${json}<\/script>\n<script id="main">${document.getElementById("main").textContent}<\/script></body></html>`;
+}
+async function publish(){
+  if(!artifact)return;
+  setSave("保存中…");
+  try{await artifact.publish(buildDoc());setSave("保存しました");}
+  catch(e){
+    const c=e&&e.code;
+    if(c==="conflict")setSave("別の画面の保存が優先されました");
+    else if(c==="not_granted"||c==="not_writer"){mode="local";setSave("閲覧専用のため、このブラウザに保存しています");}
+    else setSave("保存できませんでした。このブラウザには残っています");
+  }
+}
+app.addEventListener("change",e=>{
+  const t=e.target;
+  if(t.dataset&&t.dataset.id){state.c[t.dataset.id]?delete state.c[t.dataset.id]:state.c[t.dataset.id]=1;
+    const id=t.dataset.id;
+    // auto-tick trophy when all base spells done
+    for(const k in S){const [n,tt]=cnt(k);if(id.startsWith(k)&&n===tt)state.c[S[k].trophy]=1;}
+    if(allT.filter(x=>x[0]!=="t01").every(x=>state.c[x[0]]))state.c.t01=1;
+    persist();render();return;}
+  if(t.id==="hide"){ui.hide=t.checked;saveUi();render()}
+  
+});
+app.addEventListener("click",e=>{
+  const tb=e.target.closest(".tab");
+  if(tb){ui.tab=tb.dataset.tab;saveUi();render();return}
+  if(e.target.id==="reset"){document.getElementById("resetbox").innerHTML=`<div class="confirm">本当に全てのチェックを外しますか？<button id="yes">リセットする</button><button id="no">やめる</button></div>`;return}
+  if(e.target.id==="yes"){state.c={};persist();render();return}
+  if(e.target.id==="no"){render();return}
+});
+render();
+(async()=>{
+  try{
+    if(!window.claude||!window.claude.use)return;
+    artifact=await window.claude.use("artifact");
+    if(artifact){mode="shared";saveMsg="";render();}
+  }catch(e){}
+})();
+})();
+</script>
+
+</body></html>
