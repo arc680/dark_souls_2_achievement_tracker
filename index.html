@@ -1,8 +1,15 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>ダークソウル2 トロコン帳</title>
-<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
-<style id="css">
+<style>
+*{box-sizing:border-box}
+body{margin:0}
+[hidden]{display:none!important}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 /* Layout: one column ledger — header with progress, tab strip, grouped rows with grade seal + checkbox */
 :root{
   --bg:#e6e8ea; --panel:#f3f4f5; --line:#c9cdd2; --fg:#1d2228; --muted:#5d6670;
@@ -81,9 +88,10 @@ footer a{color:var(--muted)}
 .confirm button{border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:4px;padding:4px 10px;font:12px var(--body);cursor:pointer}
 @media (prefers-reduced-motion:reduce){.bar i{transition:none}}
 </style>
+</head>
+<body>
 <main id="app" class="wrap"></main>
-<script type="application/json" id="state">{"c":{"so0":1,"so1":1}}</script>
-<script id="main">
+<script>
 (()=>{
 const T=[
  ["ストーリー",[
@@ -235,17 +243,14 @@ const GR={P:"プラチナ",G:"ゴールド",S:"シルバー",B:"ブロンズ"};
 const TABS=[["ch","チャート"],["tr","トロフィー"],["so","魔術"],["mi","奇跡"],["py","呪術"],["he","闇術"],["bd","ビルド"]];
 const chKey=(p,i)=>"c"+p+i;
 function chCnt(){let n=0,t=0;CH.forEach(([p,,,l])=>l.forEach((_,i)=>{t++;if(state.c[chKey(p,i)])n++}));return [n,t]}
-let state={c:{}};
-try{state=JSON.parse(document.getElementById("state").textContent)||{c:{}};}catch(e){}
-if(!state.c)state.c={};
-// local fallback / merge
 const LK="ds2-trophy-v1";
 function lsGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
 function lsSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
 let ui={tab:"tr",hide:false,dlc:false};
 try{Object.assign(ui,JSON.parse(lsGet(LK+"-ui")||"{}"))}catch(e){}
-let artifact=null, mode="local", saveMsg="";
-if(!Object.keys(state.c).length){try{const l=JSON.parse(lsGet(LK)||"{}");if(l.c)state.c=l.c}catch(e){}}
+let state={c:{}};
+try{const l=JSON.parse(lsGet(LK)||"{}");if(l&&l.c)state.c=l.c}catch(e){}
+const storageOk=(()=>{try{const k=LK+"-t";localStorage.setItem(k,"1");localStorage.removeItem(k);return true}catch(e){return false}})();
 
 const app=document.getElementById("app");
 const allT=T.flatMap(g=>g[1]);
@@ -263,7 +268,7 @@ function render(){
   const [tn,tt]=tCnt();
   const pct=Math.round(tn/tt*100);
   let h=`<header><div class="eyebrow">DARK SOULS II ／ SCHOLAR OF THE FIRST SIN</div><h1>トロコン<span>帳</span></h1>
-  <div class="meter"><div class="meter-row"><div class="meter-big">${tn}<small> / ${tt} トロフィー（${pct}%）</small></div><div class="save" id="save">${esc(saveMsg||(mode==="shared"?"チェックはこのページに保存されます":"チェックはこのブラウザに保存されます"))}</div></div><div class="bar"><i style="width:${pct}%"></i></div></div></header>`;
+  <div class="meter"><div class="meter-row"><div class="meter-big">${tn}<small> / ${tt} トロフィー（${pct}%）</small></div><div class="save" id="save">${storageOk?"チェックはこのブラウザに自動保存されます":"このブラウザでは保存できません（プライベートモード等）"}</div></div><div class="bar"><i style="width:${pct}%"></i></div></div></header>`;
   h+=`<nav class="tabs" role="tablist">`+TABS.map(([k,l])=>{const c=k==="tr"?tCnt():k==="ch"?chCnt():k==="bd"?null:cnt(k);return `<button class="tab" role="tab" data-tab="${k}" aria-selected="${ui.tab===k}">${l}${c?`<b>${c[0]}/${c[1]}</b>`:""}</button>`}).join("")+`</nav>`;
   if(ui.tab!=="bd")h+=`<div class="tools"><label class="toggle"><input type="checkbox" id="hide"${ui.hide?" checked":""}>取得済みを隠す</label></div>`;
   if(ui.tab==="ch"){
@@ -291,37 +296,7 @@ function render(){
   app.innerHTML=h;
 }
 function saveUi(){lsSet(LK+"-ui",JSON.stringify(ui))}
-let timer=null;
-function persist(){
-  lsSet(LK,JSON.stringify({c:state.c}));
-  if(mode!=="shared")return;
-  clearTimeout(timer);
-  setSave("保存待ち…");
-  timer=setTimeout(publish,1500);
-}
-function setSave(m){saveMsg=m;const el=document.getElementById("save");if(el)el.textContent=m}
-function buildDoc(){
-  const head=document.head.querySelector("style");
-  const reset=head?head.textContent:"";
-  const json=JSON.stringify({c:state.c}).replace(/</g,"\\u003c");
-  const fonts=document.querySelector('link[rel="stylesheet"]');
-  return `<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>${reset}</style></head><body>`+
-   `<title>ダークソウル2 トロコン帳</title>\n<meta name="claude:viewport-fit-sides" content="cover">\n`+
-   (fonts?`<link rel="stylesheet" href="${fonts.getAttribute("href").replace(/&/g,"&amp;")}">\n`:"")+
-   `<style id="css">${document.getElementById("css").textContent}</style>\n<main id="app" class="wrap"></main>\n`+
-   `<script type="application/json" id="state">${json}<\/script>\n<script id="main">${document.getElementById("main").textContent}<\/script></body></html>`;
-}
-async function publish(){
-  if(!artifact)return;
-  setSave("保存中…");
-  try{await artifact.publish(buildDoc());setSave("保存しました");}
-  catch(e){
-    const c=e&&e.code;
-    if(c==="conflict")setSave("別の画面の保存が優先されました");
-    else if(c==="not_granted"||c==="not_writer"){mode="local";setSave("閲覧専用のため、このブラウザに保存しています");}
-    else setSave("保存できませんでした。このブラウザには残っています");
-  }
-}
+function persist(){lsSet(LK,JSON.stringify({c:state.c}))}
 app.addEventListener("change",e=>{
   const t=e.target;
   if(t.dataset&&t.dataset.id){state.c[t.dataset.id]?delete state.c[t.dataset.id]:state.c[t.dataset.id]=1;
@@ -341,14 +316,8 @@ app.addEventListener("click",e=>{
   if(e.target.id==="no"){render();return}
 });
 render();
-(async()=>{
-  try{
-    if(!window.claude||!window.claude.use)return;
-    artifact=await window.claude.use("artifact");
-    if(artifact){mode="shared";saveMsg="";render();}
-  }catch(e){}
-})();
+window.addEventListener("storage",e=>{if(e.key===LK){try{const l=JSON.parse(e.newValue||"{}");state.c=(l&&l.c)||{}}catch(x){state.c={}}render()}});
 })();
 </script>
-
-</body></html>
+</body>
+</html>
