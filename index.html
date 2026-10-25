@@ -111,7 +111,7 @@ const T=[
  ["やり込み",[
   ["t13","S","ヴァンクラッド","ヴァンクラッドを倒した","不死廟の奥。任意ボス"],
   ["t14","S","至高の武器を鍛えし者","いずれかの武器を最高レベルに強化した",""],
-  ["t15","S","ジェスチャーマスター","ジェスチャーを全て集めた",""],
+  ["t15","S","ジェスチャーマスター","ジェスチャーを全て集めた","「ジェスチャー」タブで管理"],
   ["t16","S","全ての魔術を会得せし者","全ての魔術を取得した","「魔術」タブで管理"],
   ["t17","S","全ての奇跡を会得せし者","全ての奇跡を取得した","「奇跡」タブで管理"],
   ["t18","S","全ての呪術を会得せし者","全ての呪術を取得した","「呪術」タブで管理"],
@@ -239,8 +239,24 @@ const BUILD=`
 <li>貪欲な銀の蛇の指輪とジェルドラ装備で、腐れなどのボス周回のソウル効率が上がる。</li>
 <li>四大ソウルはオルニフェクスの武器交換と取り合いになる。トロコン中はスペルを優先。</li>
 </ul></section>`;
+const GE=[
+ ["歓迎","マデューラの心を失くしたソダン。誓約を結んでから会話を尽くす"],
+ ["開戦礼","青の聖堂の青の騎士ガラインドーク。誓約「青の守護者」を結んでから会話を尽くす"],
+ ["ガッツポーズ","狩猟の森の放浪のクレイトン。牢の篝火がある部屋で話す"],
+ ["歓喜","ウーゴのバンホルト。ロザベナの石化を解いた後に話す"],
+ ["首斬り","虚ろの影の森のヴァンガルの首"],
+ ["肩慣らし","虚ろの影の森の蠍のターク。マデューラのシャラゴアからささやきの指輪を買い、装備して話す。蠍のナジカを倒した後にも話す"],
+ ["太陽賛美","溜りの谷の太陽の祭壇（誓約「太陽の後継」の場所）"],
+ ["馬鹿にする","忘却の牢のオラフィスのストレイド。懐かしい香木で石化を解く"],
+ ["土下座","渡し屋ギリガン。土の塔では2000ソウル、マデューラへ移動後なら会話を尽くすと無料"],
+ ["私だ！","王城ドラングレイグ入口の宰相の霊ベラガー"],
+ ["命乞い","不死廟の墓守アガドゥラン。松明を灯していると敵対するので消して話す"],
+ ["エイエイオー","王国隊長ドラモンド。灰の霧の核で入れる巨人の記憶の中で話す"]
+];
+const geKey=i=>"g"+i;
+function geCnt(){let n=0;GE.forEach((_,i)=>{if(state.c[geKey(i)])n++});return [n,GE.length]}
 const GR={P:"プラチナ",G:"ゴールド",S:"シルバー",B:"ブロンズ"};
-const TABS=[["ch","チャート"],["tr","トロフィー"],["so","魔術"],["mi","奇跡"],["py","呪術"],["he","闇術"],["bd","ビルド"]];
+const TABS=[["ch","チャート"],["tr","トロフィー"],["so","魔術"],["mi","奇跡"],["py","呪術"],["he","闇術"],["ge","ジェスチャー"],["bd","ビルド"]];
 const chKey=(p,i)=>"c"+p+i;
 function chCnt(){let n=0,t=0;CH.forEach(([p,,,l])=>l.forEach((_,i)=>{t++;if(state.c[chKey(p,i)])n++}));return [n,t]}
 const LK="ds2-trophy-v1";
@@ -269,7 +285,7 @@ function render(){
   const pct=Math.round(tn/tt*100);
   let h=`<header><div class="eyebrow">DARK SOULS II ／ SCHOLAR OF THE FIRST SIN</div><h1>トロコン<span>帳</span></h1>
   <div class="meter"><div class="meter-row"><div class="meter-big">${tn}<small> / ${tt} トロフィー（${pct}%）</small></div><div class="save" id="save">${storageOk?"チェックはこのブラウザに自動保存されます":"このブラウザでは保存できません（プライベートモード等）"}</div></div><div class="bar"><i style="width:${pct}%"></i></div></div></header>`;
-  h+=`<nav class="tabs" role="tablist">`+TABS.map(([k,l])=>{const c=k==="tr"?tCnt():k==="ch"?chCnt():k==="bd"?null:cnt(k);return `<button class="tab" role="tab" data-tab="${k}" aria-selected="${ui.tab===k}">${l}${c?`<b>${c[0]}/${c[1]}</b>`:""}</button>`}).join("")+`</nav>`;
+  h+=`<nav class="tabs" role="tablist">`+TABS.map(([k,l])=>{const c=k==="tr"?tCnt():k==="ch"?chCnt():k==="ge"?geCnt():k==="bd"?null:cnt(k);return `<button class="tab" role="tab" data-tab="${k}" aria-selected="${ui.tab===k}">${l}${c?`<b>${c[0]}/${c[1]}</b>`:""}</button>`}).join("")+`</nav>`;
   if(ui.tab!=="bd")h+=`<div class="tools"><label class="toggle"><input type="checkbox" id="hide"${ui.hide?" checked":""}>取得済みを隠す</label></div>`;
   if(ui.tab==="ch"){
     h+=`<div class="note">2周目と3周目の途中までで完了する流れです。<strong>1周目は全スペルを1キャラで集める前提</strong>なので、同じキャラで周回してください。周回の前にはセーブのバックアップを取っておくと安心です。</div>`;
@@ -278,6 +294,11 @@ function render(){
       const rows=list.map((it,i)=>row(chKey(p,i),it[0],"",it[1],it[2]?`<span class="seal chip">${esc(it[2])}</span>`:"")).join("");
       h+=`<section class="group"><h2>${title}<span>${n}/${list.length}</span></h2><p class="lead">${esc(lead)}</p>${rows||`<div class="empty">この周回は全て完了</div>`}</section>`;
     });
+  }else if(ui.tab==="ge"){
+    const [n,t]=geCnt();
+    h+=`<div class="note"><strong>ジェスチャーマスター</strong>：NPCなどから教わる${t}種が対象。最初から使えるジェスチャーは数に入れていません。${n===t?"全て揃いました。":`残り${t-n}種。`}覚えたジェスチャーは周回後も残ります。</div>`;
+    const rows=GE.map((it,i)=>row(geKey(i),it[0],"",it[1],"")).join("");
+    h+=`<section class="group"><h2>教わるジェスチャー<span>${n}/${t}</span></h2>${rows||`<div class="empty">全て取得済み</div>`}</section>`;
   }else if(ui.tab==="bd"){
     h+=BUILD;
   }else if(ui.tab==="tr"){
@@ -303,6 +324,7 @@ app.addEventListener("change",e=>{
     const id=t.dataset.id;
     // auto-tick trophy when all base spells done
     for(const k in S){const [n,tt]=cnt(k);if(id.startsWith(k)&&n===tt)state.c[S[k].trophy]=1;}
+    if(/^g\d+$/.test(id)){const [n,tt]=geCnt();if(n===tt)state.c.t15=1;}
     if(allT.filter(x=>x[0]!=="t01").every(x=>state.c[x[0]]))state.c.t01=1;
     persist();render();return;}
   if(t.id==="hide"){ui.hide=t.checked;saveUi();render()}
